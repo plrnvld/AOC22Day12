@@ -51,7 +51,7 @@ function isNeighbor(x, y, currHeight) {
         && vertices[y][x].height <= currHeight + 1;
 }
 
-function tryAddNeigbor(neighbors, x, y, currHeight) {
+function tryAddNeighbor(neighbors, x, y, currHeight) {
     if (isNeighbor(x, y, currHeight))
         neighbors.push(vertices[y][x]);
 }
@@ -63,10 +63,10 @@ for (let y = 0; y < vertices.length; y++) {
         let neighbors = [];
         let vertex = vertices[y][x];
         let currHeight = vertex.height;
-        tryAddNeigbor(neighbors, x-1, y, currHeight);
-        tryAddNeigbor(neighbors, x+1, y, currHeight);
-        tryAddNeigbor(neighbors, x, y-1, currHeight);
-        tryAddNeigbor(neighbors, x, y+1, currHeight);
+        tryAddNeighbor(neighbors, x-1, y, currHeight);
+        tryAddNeighbor(neighbors, x+1, y, currHeight);
+        tryAddNeighbor(neighbors, x, y-1, currHeight);
+        tryAddNeighbor(neighbors, x, y+1, currHeight);
 
         vertex.neighbors = neighbors;
         numNeighbors += neighbors.length;
