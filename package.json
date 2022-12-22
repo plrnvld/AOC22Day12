@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "^18.0.6",
+    "collections": "^5.1.13",
     "node-fetch": "^3.2.6"
   }
 }
