@@ -24,7 +24,7 @@ function charToHeight(c) {
     return 1 + c.charCodeAt(0) - 'a'.charCodeAt(0);
 }
 
-const allFileContents = fs.readFileSync('Example.txt', 'utf-8');
+const allFileContents = fs.readFileSync('Input.txt', 'utf-8');
 allFileContents.split(/\r?\n/).forEach(line => {
     let vertexLine = []
     for (let i = 0; i < line.length; i++) {
@@ -71,39 +71,34 @@ for (let y = 0; y < vertices.length; y++) {
         vertex.neighbors = neighbors;
         numNeighbors += neighbors.length;
 
-        Q.push(vertex);
+        Q.add(vertex);
 
 
         // console.log(vertex);
     }
 }
 
+let bestDist = 99999999;
+
 function findPath() {
     while (Q.length > 0) {
         let u = Q.pop();
-        
-        console.log(`Pop dist ${u.dist}`);
+
         if (u === target) {
             console.log(`Target found with dist ${u.dist}`);
+            bestDist = u.dist;
         }
 
         let availableNeighbors = u.neighbors.filter(n => Q.has(n));
-        console.log(`  Checking ${availableNeighbors.length} neighbors`);
-        for (const v of availableNeighbors) {
-            console.log("      "+v);
-        }
-            
+
         for (const v of availableNeighbors) {
             let alt = u.dist + 1;
-            
-            // console.log("Neighbor: " + v);
-            console.log(`    Alt: ${alt}, v.dist: ${v.dist}`)
+
             if (alt < v.dist) {
+                Q.delete(v); // Delete first, once dist is changed, then comparison for deletion does not work
                 v.dist = alt;
                 v.prev = u;
-                Q.delete(v);
-                Q.push(v);
-                console.log(`Pushing with dist ${v.dist}`);
+                Q.add(v);
             }
         }
     }
@@ -111,12 +106,8 @@ function findPath() {
 
 console.log(`Width: ${vertices[0].length}`);
 console.log(`Height: ${vertices.length}`);
-
 console.log(`Neighbors: ${numNeighbors}`);
-
 console.log(`SortedArray: ${Q.length}`);
 
-let dist = findPath();
-console.log(dist);
-
-
+findPath();
+console.log(bestDist);
