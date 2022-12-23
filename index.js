@@ -4,7 +4,7 @@ const fs = require('fs');
 const SortedArray = require("collections/sorted-array"); // https://www.collectionsjs.com/sorted-array
 
 class Vertex {
-    constructor(height, dist = Number.MAX_VALUE) {
+    constructor(height, dist = 1000000) {
         this.dist = dist;
         this.prev = undefined;
         this.neighbors = [];
@@ -12,13 +12,13 @@ class Vertex {
     }
 }
 
-let Q = new SortedArray([], (a, b) => a === b, (a, b) => a.dist - b.dist);
+let Q = new SortedArray([], (a, b) => a === b, (a, b) => b.dist - a.dist);
 
 console.log(Q.length);
 
 let vertices = [];
 let start = undefined;
-let end = undefined;
+let target = undefined;
 
 function charToHeight(c) {
     return 1 + c.charCodeAt(0) - 'a'.charCodeAt(0);
@@ -33,8 +33,8 @@ allFileContents.split(/\r?\n/).forEach(line => {
             start = new Vertex(1, 0);
             vertexLine.push(start);
         } else if (c === 'E') {
-            end = (new Vertex(26));
-            vertexLine.push(end);
+            target = (new Vertex(26));
+            vertexLine.push(target);
         } else {
             let v = new Vertex(charToHeight(c)); // ##################
             vertexLine.push(v);
@@ -63,15 +63,49 @@ for (let y = 0; y < vertices.length; y++) {
         let neighbors = [];
         let vertex = vertices[y][x];
         let currHeight = vertex.height;
-        tryAddNeighbor(neighbors, x-1, y, currHeight);
-        tryAddNeighbor(neighbors, x+1, y, currHeight);
-        tryAddNeighbor(neighbors, x, y-1, currHeight);
-        tryAddNeighbor(neighbors, x, y+1, currHeight);
+        tryAddNeighbor(neighbors, x - 1, y, currHeight);
+        tryAddNeighbor(neighbors, x + 1, y, currHeight);
+        tryAddNeighbor(neighbors, x, y - 1, currHeight);
+        tryAddNeighbor(neighbors, x, y + 1, currHeight);
 
         vertex.neighbors = neighbors;
         numNeighbors += neighbors.length;
 
         Q.push(vertex);
+
+
+        // console.log(vertex);
+    }
+}
+
+function findPath() {
+    while (Q.length > 0) {
+        let u = Q.pop();
+        
+        console.log(`Pop dist ${u.dist}`);
+        if (u === target) {
+            console.log(`Target found with dist ${u.dist}`);
+        }
+
+        let availableNeighbors = u.neighbors.filter(n => Q.has(n));
+        console.log(`  Checking ${availableNeighbors.length} neighbors`);
+        for (const v of availableNeighbors) {
+            console.log("      "+v);
+        }
+            
+        for (const v of availableNeighbors) {
+            let alt = u.dist + 1;
+            
+            // console.log("Neighbor: " + v);
+            console.log(`    Alt: ${alt}, v.dist: ${v.dist}`)
+            if (alt < v.dist) {
+                v.dist = alt;
+                v.prev = u;
+                Q.delete(v);
+                Q.push(v);
+                console.log(`Pushing with dist ${v.dist}`);
+            }
+        }
     }
 }
 
@@ -81,5 +115,8 @@ console.log(`Height: ${vertices.length}`);
 console.log(`Neighbors: ${numNeighbors}`);
 
 console.log(`SortedArray: ${Q.length}`);
+
+let dist = findPath();
+console.log(dist);
 
 
