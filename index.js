@@ -30,13 +30,13 @@ allFileContents.split(/\r?\n/).forEach(line => {
     for (let i = 0; i < line.length; i++) {
         let c = line.charAt(i);
         if (c === 'S') {
-            start = new Vertex(1, 0);
-            vertexLine.push(start);
-        } else if (c === 'E') {
-            target = (new Vertex(26));
+            target = new Vertex(1);
             vertexLine.push(target);
+        } else if (c === 'E') {
+            start = (new Vertex(26, 0));
+            vertexLine.push(start);
         } else {
-            let v = new Vertex(charToHeight(c)); // ##################
+            let v = new Vertex(charToHeight(c));
             vertexLine.push(v);
         }
     }
@@ -45,10 +45,9 @@ allFileContents.split(/\r?\n/).forEach(line => {
 });
 
 function isNeighbor(x, y, currHeight) {
-    // console.log(`Checking (${x},${y}) with height ${currHeight}`);
     return x >= 0 && x < vertices[0].length
         && y >= 0 && y < vertices.length
-        && vertices[y][x].height <= currHeight + 1;
+        && vertices[y][x].height >= currHeight - 1;
 }
 
 function tryAddNeighbor(neighbors, x, y, currHeight) {
@@ -72,21 +71,24 @@ for (let y = 0; y < vertices.length; y++) {
         numNeighbors += neighbors.length;
 
         Q.add(vertex);
-
-
-        // console.log(vertex);
     }
 }
 
 let bestDist = 99999999;
+let lowestSpots = [];
 
 function findPath() {
     while (Q.length > 0) {
         let u = Q.pop();
 
         if (u === target) {
-            console.log(`Target found with dist ${u.dist}`);
+            // console.log(`Target found with dist ${u.dist}`);
             bestDist = u.dist;
+        }
+
+        if (u.height === 1) {
+            // console.log(`Lowest found with dist ${u.dist}`);
+            lowestSpots.push(u);
         }
 
         let availableNeighbors = u.neighbors.filter(n => Q.has(n));
@@ -110,4 +112,8 @@ console.log(`Neighbors: ${numNeighbors}`);
 console.log(`SortedArray: ${Q.length}`);
 
 findPath();
+
 console.log(bestDist);
+console.log(lowestSpots.reduce(function(prev, curr) {
+    return prev.dist < curr.dist ? prev : curr;
+}));
